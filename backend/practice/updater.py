@@ -7,7 +7,7 @@ from agents.extensions.models.litellm_model import LitellmModel
 
 from config import NOTES_DIR, SQLITE_FILE_NAME
 from practice.models import Option, Question
-from sqlmodel import SQLModel, Session, create_engine, select
+from sqlmodel import SQLModel, Session, create_engine, delete, select
 
 
 SQLITE_URL = f"sqlite:///{SQLITE_FILE_NAME}"
@@ -59,7 +59,13 @@ class PracticeUpdater:
                 session.add(option_3)
                 session.add(option_4)
                 session.commit()
-        
+
+        # Delete any old questions
+        with Session(engine) as session:
+            statement = delete(Question).where(Question.note_name == note_name)
+            session.exec(statement)
+            session.commit()
+
         agent = Agent(name="Practice Question Generator",
                       instructions="You're a tutor for a student. Given some notes, your job is to generate multiple-choice practice questions for those notes. Add each question by calling the `add_practice_question` tool once for each question.",
                       model=LitellmModel(model="lm_studio/openai/gpt-oss-20b", api_key="lm-studio", base_url="http://127.0.0.1:1234/v1"),

@@ -5,7 +5,7 @@ class Question(SQLModel, table=True):
     note_name: str = Field(index=True)
     question: str
 
-    options: list["Option"] = Relationship(back_populates="question")
+    options: list["Option"] = Relationship(back_populates="question", cascade_delete=True)
 
 class Option(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
