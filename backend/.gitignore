@@ -11,3 +11,6 @@ wheels/
 
 # Generated data
 data
+
+# Config
+config.py
