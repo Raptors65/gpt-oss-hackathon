@@ -1,12 +1,13 @@
 import os
 import time
+from typing import TypedDict
 
 from agents import Agent, Runner, function_tool
 from agents.extensions.models.litellm_model import LitellmModel
 
 from config import NOTES_DIR, SQLITE_FILE_NAME
 from practice.models import Option, Question
-from sqlmodel import SQLModel, Session, create_engine
+from sqlmodel import SQLModel, Session, create_engine, select
 
 
 SQLITE_URL = f"sqlite:///{SQLITE_FILE_NAME}"
@@ -66,3 +67,33 @@ class PracticeUpdater:
         
         with open(os.path.join(NOTES_DIR, note_name), encoding="utf-8") as notes_file:
             await Runner.run(agent, f"Please generate practice questions for the following notes:\n\n{notes_file.read()}")
+
+class OptionOutput(TypedDict):
+    description: str
+    isCorrect: bool
+
+class QuestionOutput(TypedDict):
+    question: str
+    options: list[OptionOutput]
+
+def get_questions_for_note(note_name: str) -> list[QuestionOutput]:
+    """Returns a dict containing all the questions."""
+
+    with Session(engine) as session:
+        statement = select(Question).where(Question.note_name == note_name)
+        results = session.exec(statement)
+        questions = results.all()
+
+        return [
+            {
+                "question": question.question,
+                "options": [
+                    {
+                        "description": option.description,
+                        "isCorrect": option.correct
+                    }
+                    for option in question.options
+                ],
+            }
+            for question in questions
+        ]
