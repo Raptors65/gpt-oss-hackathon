@@ -61,7 +61,7 @@ class PracticeUpdater:
                 session.commit()
         
         agent = Agent(name="Practice Question Generator",
-                      instructions="You're a tutor for a student. Given some notes, your job is to generate multiple-choice practice questions for those notes.",
+                      instructions="You're a tutor for a student. Given some notes, your job is to generate multiple-choice practice questions for those notes. Add each question by calling the `add_practice_question` tool once for each question.",
                       model=LitellmModel(model="lm_studio/openai/gpt-oss-20b", api_key="lm-studio", base_url="http://127.0.0.1:1234/v1"),
                       tools=[add_practice_question])
         
