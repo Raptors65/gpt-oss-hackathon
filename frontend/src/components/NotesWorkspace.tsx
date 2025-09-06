@@ -16,6 +16,7 @@ import { toast } from "sonner";
 
 interface Note {
   name: string;
+  lastModified: number;
 }
 
 interface Question {
@@ -73,7 +74,7 @@ export default function NotesWorkspace() {
       
       const data = await response.json();
       const notesList = data.notes || [];
-      setNotes(notesList.map((name: string) => ({ name })));
+      setNotes(notesList.map((note: { note_name: string, last_modified: number }) => ({ name: note.note_name, lastModified: note.last_modified })));
       toast.success("Notes refreshed");
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Failed to fetch notes";
@@ -339,7 +340,7 @@ export default function NotesWorkspace() {
                   </Card>
                 ) : (
                   // Notes list
-                  filteredNotes.map((note, index) => (
+                  filteredNotes.toSorted((a, b) => b.lastModified - a.lastModified).map((note, index) => (
                     <div
                       key={note.name}
                       role="listitem"
@@ -352,9 +353,14 @@ export default function NotesWorkspace() {
                       }`}
                       onClick={() => handleNoteSelect(note.name)}
                     >
-                      <span className="truncate text-sm font-medium text-sidebar-foreground">
-                        {note.name}
-                      </span>
+                      <div>
+                        <p className="truncate text-sm font-medium text-sidebar-foreground">
+                          {note.name}
+                        </p>
+                        <p className="truncate text-sm font-light text-sidebar-foreground">
+                          {new Date(note.lastModified * 1000).toLocaleString()}
+                        </p>
+                      </div>
                       <Button
                         variant="ghost"
                         size="sm"

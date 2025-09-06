@@ -62,7 +62,13 @@ async def list_notes():
     """Lists the names of all the user's notes."""
 
     return {
-        "notes": os.listdir(NOTES_DIR)
+        "notes": [
+            {
+                "note_name": filename,
+                "last_modified": os.path.getmtime(os.path.join(NOTES_DIR, filename))
+            }
+            for filename in os.listdir(NOTES_DIR)
+        ]
     }
 
 @app.get("/api/get-practice-questions")
