@@ -500,6 +500,7 @@ name = "goose-backend"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "aiohttp" },
     { name = "chromadb" },
     { name = "fastapi", extra = ["standard"] },
     { name = "openai" },
@@ -509,6 +510,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aiohttp", specifier = ">=3.12.15" },
     { name = "chromadb", specifier = ">=1.0.20" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.1" },
     { name = "openai", specifier = ">=1.102.0" },

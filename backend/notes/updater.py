@@ -1,8 +1,10 @@
 import asyncio
+import aiohttp
 
 from agents import Agent, Runner
 from agents.extensions.models.litellm_model import LitellmModel
 from notes.tools import list_notes, read_note, update_note
+from notes.resources import Resource
 
 class NotesUpdater:
     """Handles updating of notes."""
@@ -30,10 +32,10 @@ class NotesUpdater:
         if self.worker_task:
             await self.worker_task
 
-    async def add_update(self, resource: str):
+    async def add_update(self, resource: Resource):
         """Add a new resource update request to the queue."""
 
-        resource_text = await self._get_text_from_resource(resource)
+        resource_text = await resource.get_text()
 
         await self.queue.put(resource_text)
 
@@ -51,15 +53,15 @@ class NotesUpdater:
                 self.queue.task_done()
 
     async def _process_resource(self, resource_text: str):
-        """Simulate the actual note update (replace with your real logic)."""
-        
+        """Updates the notes to include the content in `resource_text`."""
+
         print(f"Processing resource: {resource_text}")
         await Runner.run(self.agent, f"Please update the notes to include notes from the following content:\n\n{resource_text}")
         print(f"Finished processing: {resource_text}")
-    
-    async def _get_text_from_resource(self, resource: str):
+
+    async def _get_text_from_resource(self, resource: str) -> str:
         """Gets machine-readable text from a resource."""
 
-        # TODO: implement
-        return resource
-
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://md.dhr.wtf/", params={"url": resource}) as response:
+                return await response.text()
