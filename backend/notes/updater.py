@@ -1,10 +1,13 @@
 import asyncio
 import aiohttp
+import time
 
 from agents import Agent, Runner
 from agents.extensions.models.litellm_model import LitellmModel
 from notes.tools import list_notes, read_note, update_note
 from notes.resources import Resource
+from practice.updater import PracticeUpdater
+
 
 class NotesUpdater:
     """Handles updating of notes."""
@@ -17,6 +20,7 @@ class NotesUpdater:
                            instructions="You're an efficient note-writer for a student. Your job is to take in a piece of text, then extract the most important parts and update the existing Markdown notes or create new Markdown notes to include the info there.",
                            model=LitellmModel(model="lm_studio/openai/gpt-oss-20b", api_key="lm-studio", base_url="http://127.0.0.1:1234/v1"),
                            tools=[list_notes, read_note, update_note])
+        self._practice_updater = PracticeUpdater()
 
     async def start(self):
         """Start the background worker that processes update requests."""
@@ -56,8 +60,11 @@ class NotesUpdater:
         """Updates the notes to include the content in `resource_text`."""
 
         print(f"Processing resource: {resource_text}")
+        start_time = time.time()
         await Runner.run(self.agent, f"Please update the notes to include notes from the following content:\n\n{resource_text}")
         print(f"Finished processing: {resource_text}")
+        await self._practice_updater.update()
+        
 
     async def _get_text_from_resource(self, resource: str) -> str:
         """Gets machine-readable text from a resource."""

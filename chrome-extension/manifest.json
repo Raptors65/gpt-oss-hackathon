@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Goose URL Logger",
+  "version": "1.0",
+  "description": "Sends visited URLs to Goose.",
+  "permissions": ["tabs", "webNavigation"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
