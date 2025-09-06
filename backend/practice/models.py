@@ -7,7 +7,6 @@ class Question(SQLModel, table=True):
 
     options: list["Option"] = Relationship(back_populates="question")
 
-
 class Option(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     description: str

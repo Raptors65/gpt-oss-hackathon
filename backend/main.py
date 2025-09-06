@@ -1,5 +1,3 @@
-import asyncio
-
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from openai import AsyncOpenAI
@@ -12,7 +10,7 @@ custom_client = AsyncOpenAI(base_url="http://localhost:1234/v1", api_key="")
 set_default_openai_client(custom_client)
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_: FastAPI):
     await updater.start()
     yield
     # await updater.stop()

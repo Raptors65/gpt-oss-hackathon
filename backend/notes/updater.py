@@ -1,6 +1,5 @@
 import asyncio
 import aiohttp
-import time
 
 from agents import Agent, Runner
 from agents.extensions.models.litellm_model import LitellmModel
@@ -60,7 +59,6 @@ class NotesUpdater:
         """Updates the notes to include the content in `resource_text`."""
 
         print(f"Processing resource: {resource_text}")
-        start_time = time.time()
         await Runner.run(self.agent, f"Please update the notes to include notes from the following content:\n\n{resource_text}")
         print(f"Finished processing: {resource_text}")
         await self._practice_updater.update()
