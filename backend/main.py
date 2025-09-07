@@ -38,7 +38,7 @@ app.add_middleware(
 async def add_website(url: str):
     """Adds a website to the notes."""
 
-    if all(domain in url for domain in LEARNING_DOMAINS):
+    if all(domain not in url for domain in LEARNING_DOMAINS):
         return
 
     await updater.add_update(Webpage(url))
